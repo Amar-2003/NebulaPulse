@@ -28,6 +28,7 @@ class Player(commands.Cog):
         
     
     async def song_over(self,ctx):
+        self.first_song_played = False
         if(len(self.song_queue) > 0):
             url = self.song_queue[0]
             
