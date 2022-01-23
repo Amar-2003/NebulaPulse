@@ -1,5 +1,4 @@
 import os
-from pickle import FALSE
 import discord
 import asyncio
 from discord.ext import commands
@@ -28,13 +27,15 @@ class Player(commands.Cog):
         
     
     async def song_over(self,ctx):
-        self.first_song_played = False
+        
         if(len(self.song_queue) > 0):
             url = self.song_queue[0]
             
             self.song_queue.pop(0)
             
             await self.play_song(ctx,url)
+        else:
+            self.first_song_played = False
             
             
             
