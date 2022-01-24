@@ -1,4 +1,5 @@
 import os
+from click import command
 import discord
 import asyncio
 from discord.ext import commands
@@ -23,25 +24,36 @@ api_key = "AIzaSyA_IZxnw_fv86H9bMOPyxfhD5Qg9BRopig"
 class Player(commands.Cog):
     def __init__(self,client):
         self.client = client
-        self.song_queue = []
+        self.song_queue = {}
         self.chat_channel_id = None
-        self.first_song_played = False
+        self.first_song_played = {}
         
+        
+    def setup(self):
+        
+        
+        for guild in self.client.guilds:  
+            print(guild.id)     
+            self.song_queue[guild.id] = []
+            self.first_song_played[guild.id] = False
     
     async def song_over(self,ctx):
         
         if(len(self.song_queue) > 0):
-            url = self.song_queue[0]
+            url = self.song_queue[ctx.message.guild.id][0]
             
-            self.song_queue.pop(0)
+            self.song_queue[ctx.message.guild.id].pop(0)
             
             await self.play_song(ctx,url)
         else:
-            self.first_song_played = False
+            self.first_song_played[ctx.message.guild.id] = False
             
             
-            
-
+    @commands.Cog.listener()
+    async def on_ready(self):
+        print(f'{client.user} has connected to Discord')
+        self.setup()
+    
     async def play_song(self,ctx,url):
         YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
         FFMPEG_OPTIONS = {
@@ -60,7 +72,7 @@ class Player(commands.Cog):
             voice = await channel.connect()
         
         if not voice.is_playing():
-            if(self.first_song_played is False):
+            if(self.first_song_played[ctx.message.guild.id] is False):
                 for channel in ctx.guild.channels:
                     if channel.name == ctx.message.channel:
                         self.chat_channel_id = channel.id
@@ -81,15 +93,14 @@ class Player(commands.Cog):
             await ctx.send('Bot is playing')
         
         else :
-            self.first_song_played = True
-            self.song_queue.append(url)
+            self.first_song_played[ctx.message.guild.id] = True
+            self.song_queue[ctx.message.guild.id].append(url)
+            print(ctx.message.guild.id)
             await ctx.send(f"this song added to queue {url}")
             print("song added to Queue")
             return
         
-    @client.event
-    async def on_ready():
-        print(f'{client.user} has connected to Discord')
+    
 
     @commands.command()
     async def join (self,ctx):
@@ -156,6 +167,8 @@ class Player(commands.Cog):
         for x in client.voice_clients:
             if(x.guild == ctx.message.guild):
                 return await x.disconnect()
+
+        self.song_queue[ctx.message.guild.id] = []
         
 
     
