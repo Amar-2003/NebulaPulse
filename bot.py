@@ -10,13 +10,15 @@ from dotenv import load_dotenv
 from discord.ext import tasks
 from apiclient.discovery import build
 
-
+#Todo
+# 1 Queue list feature
+# 2 Queue list
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
-Queue = ["https://www.youtube.com/watch?v=kSmMOsJmkfs"]
+
 client = commands.Bot(command_prefix=".")
-api_key = "AIzaSyA6tM3-R8VtGiCZOsthYRtiS9ierSh_M68"
+api_key = "AIzaSyA_IZxnw_fv86H9bMOPyxfhD5Qg9BRopig"
 
 class Player(commands.Cog):
     def __init__(self,client):
