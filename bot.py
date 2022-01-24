@@ -162,4 +162,4 @@ class Player(commands.Cog):
 client.add_cog(Player(client))
 
 
-client.run(TOKEN)
+client.run("ODM1ODgxMzcxNjQ1NjQwNzU0.YIV5MA.2LgV8M1uqwkWL1rX-phHVUmkUPo")
