@@ -9,11 +9,11 @@ from discord import TextChannel
 from youtube_dl import YoutubeDL
 from dotenv import load_dotenv
 from discord.ext import tasks
-from apiclient.discovery import build
+from googleapiclient.discovery import build
 
 #Todo
-# 1 Queue list feature
-# 2 Queue list
+# 1 Queue list view feature
+# 2 deleting song from queue choice
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
@@ -39,7 +39,8 @@ class Player(commands.Cog):
     
     async def song_over(self,ctx):
         
-        if(len(self.song_queue) > 0):
+        if(len(self.song_queue[ctx.message.guild.id]) > 0):
+            print(ctx.message.guild.id)
             url = self.song_queue[ctx.message.guild.id][0]
             
             self.song_queue[ctx.message.guild.id].pop(0)
@@ -60,18 +61,23 @@ class Player(commands.Cog):
             'before_options': '-reconnect 1 -reconnect_stream 1 -reconnect_delay_max 5', 'options': '-vn'
         }
         voice = ctx.message.guild.voice_client
-        channel = ctx.message.author.voice.channel        
         
         #text_channel.send(f"Playing {url}")
 
         if voice is None:            
             voice = get(client.voice_clients,guild=ctx.guild)
         if voice and voice.is_connected():
+            channel = ctx.message.author.voice.channel        
+
             await voice.move_to(channel)
         else:
+            channel = ctx.message.author.voice.channel        
+
             voice = await channel.connect()
         
         if not voice.is_playing():
+            channel = ctx.message.author.voice.channel        
+
             if(self.first_song_played[ctx.message.guild.id] is False):
                 for channel in ctx.guild.channels:
                     if channel.name == ctx.message.channel:
