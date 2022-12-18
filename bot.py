@@ -10,7 +10,7 @@ from youtube_dl import YoutubeDL
 from dotenv import load_dotenv
 from discord.ext import tasks
 from googleapiclient.discovery import build
-
+from keep_alive import keep_alive
 #Todo
 # 1 Queue list view feature
 # 2 deleting song from queue choice
@@ -175,10 +175,21 @@ class Player(commands.Cog):
                 return await x.disconnect()
 
         self.song_queue[ctx.message.guild.id] = []
-        
+    @commands.command()
+    async def q(self,ctx):
+            YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
+            counter  = 1
+            for url in self.song_queue[ctx.message.guild.id]:
+                with YoutubeDL(YDL_OPTIONS) as ydl:
+                    info = ydl.extract_info(url, download = False)
+                    title = info['title']
+                    await ctx.send(f"{counter}. {title}")
+
+                counter += 1
+
 
     
 client.add_cog(Player(client))
 
-
+keep_alive()
 client.run(TOKEN)
